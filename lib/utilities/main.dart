@@ -1,7 +1,18 @@
-import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:chat_application/providers/auth_provider.dart';
+import 'package:chat_application/screens/home_screen.dart';
+import 'package:chat_application/screens/login_screen.dart';
+import 'package:chat_application/utilities/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -9,10 +20,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      //home: ,
+    return MultiProvider(
+        providers: [
+      ChangeNotifierProvider(create: (_)=> AuthProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: AuthenticationWrapper(),
+      ),
+
     );
+  }
+}
+class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(builder: (context,authProvider,child){
+      if(authProvider.isSignedIn){
+        return HomeScreen();
+      }
+      else{
+        return LoginScreen();
+      }
+    });
   }
 }
 

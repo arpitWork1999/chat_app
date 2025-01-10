@@ -45,12 +45,13 @@ class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(builder: (context,authProvider,child){
-      if(authProvider.isSignedIn){
-        return HomeScreen();
-      }
-      else{
-        return LoginScreen();
-      }
+      return LoginScreen();
+      // if(authProvider.isSignedIn){
+      //   return HomeScreen();
+      // }
+      // else{
+      //   return LoginScreen();
+      // }
     });
   }
 }

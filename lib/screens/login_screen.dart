@@ -13,8 +13,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+
+  String? _username, _password;
+
+  void logIn(){
+    if(formKey.currentState!.validate()){
+      print("Logged In");
+    }
+    else{
+      Fluttertoast.showToast(msg: "Log In Failed!");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,95 +40,117 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Log In",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                      labelText: "Email", border: OutlineInputBorder()),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please Enter Email";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  controller: _passController,
-                  keyboardType: TextInputType.visiblePassword,
-                  decoration: const InputDecoration(
-                      labelText: "Password", border: OutlineInputBorder()),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please Enter Password";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                SizedBox(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width / 1.7,
-                  child: ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await authProvider.signin(
-                              _emailController.text, _passController.text);
-                          Fluttertoast.showToast(msg: "Login Success");
-
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen()));
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white),
-                      child: const Text(
-                        "Log In",
-                        style: TextStyle(fontSize: 16),
-                      )),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text("OR"),
-                SizedBox(
-                  height: 5,
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignUpScreen()));
-                  },
-                  child: Text(
-                    "Create Account",
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Log In",
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.email),
+                        labelText: "Email", border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value!.isEmpty ||
+                          !RegExp(r"^(?!.*\s)[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+(?!.*\s)")
+                              .hasMatch(value)) {
+                        if (value == '') {
+                          return "Your username is required";
+                        } else {
+                          return "Please provide a valid email address";
+                        }
+                      }
+                      return null;
+                    },
+                    onSaved: (value)=>_username,
+
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return "Please Enter Email";
+                    //   }
+                    //   return null;
+                    // },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    controller: _passController,
+                    obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                        labelText: "Password", border: OutlineInputBorder()),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please Enter Password";
+                      }
+                      return null;
+                    },
+                    onSaved: (value)=> _password,
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: MediaQuery.of(context).size.width / 1.7,
+                    child: ElevatedButton(
+                      onPressed: logIn,
+                        // onPressed: () async {
+                        //   try {
+                        //     await authProvider.signin(
+                        //         _emailController.text, _passController.text);
+                        //     Fluttertoast.showToast(msg: "Login Success");
+                        //
+                        //     Navigator.pushReplacement(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //             builder: (context) => HomeScreen()));
+                        //   } catch (e) {
+                        //     print(e);
+                        //   }
+                        // },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white),
+                        child: const Text(
+                          "Log In",
+                          style: TextStyle(fontSize: 16),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text("OR"),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignUpScreen()));
+                    },
+                    child: Text(
+                      "Create Account",
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,6 +1,5 @@
 
 import 'package:chat_application/providers/auth_provider.dart';
-import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/screens/login_screen.dart';
 import 'package:chat_application/utilities/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';

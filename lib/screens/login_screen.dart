@@ -1,9 +1,11 @@
 import 'package:chat_application/providers/auth_provider.dart';
-import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../apiService/api_service.dart';
+import '../utilities/shared_preference.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,14 +19,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-
+  ApiService apiService = ApiService();
   String? _username, _password;
 
-  void logIn(){
-    if(formKey.currentState!.validate()){
+  Future<void> logIn() async {
+    if (formKey.currentState!.validate()) {
+      apiService
+          .logInApi(
+              personalInfo: _emailController.text.trim(),
+              password: _passController.text)
+          .then((v) {
+        if (v.statusCode == 200) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          UserPreferences().saveUser(v);
+        }
+      });
+
       print("Logged In");
-    }
-    else{
+    } else {
       Fluttertoast.showToast(msg: "Log In Failed!");
     }
   }
@@ -56,8 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.email),
-                        labelText: "Email", border: OutlineInputBorder()),
+                        prefixIcon: Icon(Icons.email),
+                        labelText: "Email",
+                        border: OutlineInputBorder()),
                     validator: (value) {
                       if (value!.isEmpty ||
                           !RegExp(r"^(?!.*\s)[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+(?!.*\s)")
@@ -70,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                       return null;
                     },
-                    onSaved: (value)=>_username,
+                    onSaved: (value) => _username,
 
                     // validator: (value) {
                     //   if (value == null || value.isEmpty) {
@@ -87,15 +101,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: true,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.lock),
-                        labelText: "Password", border: OutlineInputBorder()),
+                        prefixIcon: Icon(Icons.lock),
+                        labelText: "Password",
+                        border: OutlineInputBorder()),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please Enter Password";
                       }
                       return null;
                     },
-                    onSaved: (value)=> _password,
+                    onSaved: (value) {
+                      setState(() {
+                        print("_password====$value");
+                      });
+                    },
                   ),
                   const SizedBox(
                     height: 30,
@@ -104,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 50,
                     width: MediaQuery.of(context).size.width / 1.7,
                     child: ElevatedButton(
-                      onPressed: logIn,
+                        onPressed: logIn,
                         // onPressed: () async {
                         //   try {
                         //     await authProvider.signin(

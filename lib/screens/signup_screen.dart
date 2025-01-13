@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import '../apiService/api_service.dart';
 import 'home_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
+  ApiService apiService = ApiService();
 
   String? _firstName,
       _lastName,
@@ -31,11 +33,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _password,
       _confirmPassword;
 
-  void signUp() {
+  Future<void> signUp() async {
     if (formKey.currentState!.validate()) {
-      if(_password == _confirmPassword) {
+      if (_password == _confirmPassword) {
         print("Saved");
-      }else{
+        final provider = Provider.of<AuthProvider>(context, listen: false);
+        await apiService
+            .signUpApi(
+                userName: _firstNameController.text.trim(),
+                fullName: "${_firstNameController.text} ${_lastNameController.text.trim()}",
+                countryCode: provider.countryCode,
+                phoneNumber: _phoneNumberController.text.trim(),
+                email: _emailController.text.trim(),
+                password: _passController.text.trim())
+            .then((v) {
+              if(v.statusCode==200){
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              }
+        });
+      } else {
         Fluttertoast.showToast(msg: "MisMatch Password!");
       }
     } else {
@@ -123,20 +140,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _phoneNumberController,
                     keyboardType: TextInputType.name,
-                    decoration:  InputDecoration(
-                        prefixIcon: Consumer
-                        <AuthProvider>(builder:
-                            (context, user,_) =>
-                            CountryCodePicker(
-                          onChanged: (countryCode){
-                            user.name=countryCode.dialCode!;
-                            print("code====>${user.countryCode}");                          },
-                          initialSelection: user.countryCode,
-                          favorite: ['+91', 'IN'],
-                          showCountryOnly: false,
-                          showOnlyCountryWhenClosed: false,
-                          alignLeft: false,
-                        ),),
+                    decoration: InputDecoration(
+                        prefixIcon: Consumer<AuthProvider>(
+                          builder: (context, user, _) => CountryCodePicker(
+                            onChanged: (countryCode) {
+                              user.name = countryCode.dialCode!;
+                              print("code====>${user.countryCode}");
+                            },
+                            initialSelection: user.countryCode,
+                            favorite: ['+91', 'IN'],
+                            showCountryOnly: false,
+                            showOnlyCountryWhenClosed: false,
+                            alignLeft: false,
+                          ),
+                        ),
                         labelText: "Enter your phone number",
                         border: OutlineInputBorder()),
                     validator: (value) {

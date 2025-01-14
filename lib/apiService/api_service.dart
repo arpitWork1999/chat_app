@@ -21,7 +21,6 @@ class ApiService{
         },
       );
       if (response.statusCode == 200) {
-        print("response---->>>>${response.body}");
         return User.fromJson(jsonDecode(response.body) );
       } else {
         throw Exception('Failed to post data');
@@ -31,7 +30,6 @@ class ApiService{
       throw Exception('An error occurred: $e');
     }
   }
-
 
   Future<SuccessResponse> signUpApi(
       {

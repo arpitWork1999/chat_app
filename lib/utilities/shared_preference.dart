@@ -14,4 +14,15 @@ class UserPreferences{
     prefs.setBool('isLoggedIn', true);
 
   }
+
+  Future getUser() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? userName = prefs.getString("userName");
+    String? fullName = prefs.getString("fullName");
+    String? countryCode = prefs.getString("countryCode");
+    String? phoneNumber = prefs.getString("phoneNumber");
+    String? email = prefs.getString("email");
+    String? password = prefs.getString("password");
+  }
 }

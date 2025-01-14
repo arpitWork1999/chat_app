@@ -1,12 +1,12 @@
-
 import 'package:chat_application/providers/auth_provider.dart';
+import 'package:chat_application/providers/shared_prefrences_provider.dart';
 import 'package:chat_application/screens/login_screen.dart';
 import 'package:chat_application/utilities/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
@@ -20,30 +20,30 @@ void main() async{
   // );
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-      ChangeNotifierProvider(create: (_)=> AuthProvider()),
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => SharedPrefrencesService())
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
         home: AuthenticationWrapper(),
       ),
-
     );
   }
 }
+
 class AuthenticationWrapper extends StatelessWidget {
   const AuthenticationWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context,authProvider,child){
+    return Consumer<AuthProvider>(builder: (context, authProvider, child) {
       return LoginScreen();
       // if(authProvider.isSignedIn){
       //   return HomeScreen();
@@ -54,7 +54,3 @@ class AuthenticationWrapper extends StatelessWidget {
     });
   }
 }
-
-
-
-

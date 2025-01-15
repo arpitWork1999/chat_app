@@ -5,6 +5,7 @@ import 'package:chat_application/utilities/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,23 +13,31 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  runApp(MyApp());
+  // );0--
+  // Initialize Shared Preferences
+
+  final sharedPreferencesService = SharedPrefrencesService();
+  await sharedPreferencesService.loadPrefrences();
+  runApp(MyApp(sharedPreferencesService: sharedPreferencesService,));
 }
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SharedPrefrencesService sharedPreferencesService;
+
+  const MyApp({super.key, required this.sharedPreferencesService});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => SharedPrefrencesService())
+        ChangeNotifierProvider.value(value: sharedPreferencesService),
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -43,9 +52,11 @@ class AuthenticationWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context, authProvider, child) {
-      return LoginScreen();
-      // if(authProvider.isSignedIn){
+    return Consumer<SharedPrefrencesService>(
+        builder: (context, sharedPreference, _) {
+          // sharedPreference.loadPrefrences();
+      return sharedPreference.isLoggedIn ? HomeScreen() : LoginScreen();
+      //     if(sharedPreference.isLoggedIn){
       //   return HomeScreen();
       // }
       // else{

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefrencesService extends ChangeNotifier{
+class SharedPrefrencesService extends ChangeNotifier {
   String _userName = " ";
   String _fullName = " ";
   String _countryCode = " ";
   String _phoneNumber = " ";
   String _email = " ";
   String _password = " ";
+  bool _isLoggedIn = false;
+
+  bool get isLoggedIn => _isLoggedIn;
 
   String get userName => _userName;
 
@@ -21,15 +24,23 @@ class SharedPrefrencesService extends ChangeNotifier{
 
   String get password => _password;
 
-  Future<void> loadPrefrences()async{
+  Future<void> logout() async {
+    _isLoggedIn = false;
     final prefs = await SharedPreferences.getInstance();
-    _userName = prefs.getString("userName")??" ";
-    _fullName = prefs.getString("fullName")??" ";
-    _countryCode = prefs.getString("countryCode")??" ";
-    _phoneNumber = prefs.getString("phoneNumber")??" ";
-    _email = prefs.getString("email")??" ";
-    _password = prefs.getString("password")??" ";
+    await prefs.setBool('isLoggedIn', false);
+    notifyListeners();
+  }
 
+  Future loadPrefrences() async {
+    // await Future.delayed(Duration(seconds: 3));
+    final prefs = await SharedPreferences.getInstance();
+    _userName = prefs.getString("userName") ?? " ";
+    _fullName = prefs.getString("fullName") ?? " ";
+    _countryCode = prefs.getString("countryCode") ?? " ";
+    _phoneNumber = prefs.getString("phoneNumber") ?? " ";
+    _email = prefs.getString("email") ?? " ";
+    _password = prefs.getString("password") ?? " ";
+    _isLoggedIn = prefs.getBool("isLoggedIn")?? false;
     notifyListeners();
   }
 }

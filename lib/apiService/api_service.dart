@@ -20,6 +20,7 @@ class ApiService{
           "password": password,
         },
       );
+      print("Response===>${response.body}");
       if (response.statusCode == 200) {
         return User.fromJson(jsonDecode(response.body) );
       } else {
@@ -30,7 +31,6 @@ class ApiService{
       throw Exception('An error occurred: $e');
     }
   }
-
   Future<SuccessResponse> signUpApi(
       {
         required String userName,

@@ -23,6 +23,8 @@ class User {
 }
 
 class Data {
+  List<String>? following;
+  List<String>? followers;
   String? sId;
   String? userName;
   String? password;
@@ -41,7 +43,9 @@ class Data {
   String? otpExpiry;
 
   Data(
-      {this.sId,
+      {this.following,
+        this.followers,
+        this.sId,
         this.userName,
         this.password,
         this.fullName,
@@ -59,6 +63,8 @@ class Data {
         this.otpExpiry});
 
   Data.fromJson(Map<String, dynamic> json) {
+    following = json['following'].cast<String>();
+    followers = json['followers'].cast<String>();
     sId = json['_id'];
     userName = json['user_name'];
     password = json['password'];
@@ -79,6 +85,8 @@ class Data {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['following'] = this.following;
+    data['followers'] = this.followers;
     data['_id'] = this.sId;
     data['user_name'] = this.userName;
     data['password'] = this.password;

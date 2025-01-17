@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screens/login_screen.dart';
+
 class SharedPrefrencesService extends ChangeNotifier {
   String _userName = " ";
   String _fullName = " ";
@@ -24,10 +26,13 @@ class SharedPrefrencesService extends ChangeNotifier {
 
   String get password => _password;
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     _isLoggedIn = false;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    //await prefs.setBool('isLoggedIn', false);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const LoginScreen()));
     notifyListeners();
   }
 

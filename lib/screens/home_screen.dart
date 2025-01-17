@@ -55,9 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: MediaQuery.of(context).size.width / 3,
                   child: ElevatedButton(
                       onPressed: (){
-                        prefService.logout;
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                        prefService.logout(context);
+
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,

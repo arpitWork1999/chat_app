@@ -11,6 +11,8 @@ class UserPreferences{
     prefs.setString("phoneNumber", user.data!.phoneNumber.toString());
     prefs.setString("email", user.data!.email.toString());
     prefs.setString("password", user.data!.password.toString());
+    //prefs.setString("id", user.data!..toString());
+
     prefs.setBool('isLoggedIn', true);
 
   }

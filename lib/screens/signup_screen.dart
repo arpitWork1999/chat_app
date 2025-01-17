@@ -1,11 +1,13 @@
 import 'package:chat_application/providers/auth_provider.dart';
 import 'package:chat_application/screens/login_screen.dart';
+import 'package:chat_application/screens/otp_screen.dart';
+import 'package:chat_application/service/firebase_service/firebase.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-
-import '../apiService/api_service.dart';
+import '../providers/shared_prefrences_provider.dart';
+import '../service/api_service/api_service.dart';
 import 'home_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -24,11 +26,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
+  
   ApiService apiService = ApiService();
+  DatabaseMethods databaseMethods = DatabaseMethods();
 
   Future<void> signUp() async {
     if (formKey.currentState!.validate()) {
-      if (_passController == _confirmPassController) {
+      if (_passController.text == _confirmPassController.text) {
         print("Saved");
         final provider = Provider.of<AuthProvider>(context, listen: false);
         await apiService
@@ -43,17 +47,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .then((v) {
           if (v.statusCode == 200) {
             Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => LoginScreen()));
+                MaterialPageRoute(builder: (context) => OtpScreen(email: _emailController.text.trim(),)));
           }
-        });
+        })
+            .catchError((error) {
+              print("error$error");
+        })
+        ;
       } else {
-        Fluttertoast.showToast(msg: "MisMatch Password!");
+         print("object");
       }
     } else {
       Fluttertoast.showToast(msg: "Sign Up Failed!");
     }
   }
-
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   // Future<void> _signUp() async{
@@ -76,6 +83,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final prefService = Provider.of<SharedPrefrencesService>(context);
+
     final authProvider = Provider.of<AuthProvider>(context);
     return GestureDetector(
       onTap: FocusManager.instance.primaryFocus?.unfocus,

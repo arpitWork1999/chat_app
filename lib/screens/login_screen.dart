@@ -4,8 +4,8 @@ import 'package:chat_application/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import '../apiService/api_service.dart';
 import '../providers/shared_prefrences_provider.dart';
+import '../service/api_service/api_service.dart';
 import '../utilities/shared_preference.dart';
 import 'home_screen.dart';
 
@@ -22,7 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+
   ApiService apiService = ApiService();
+
 
   Future<void> logIn() async {
     if (formKey.currentState!.validate()) {
@@ -32,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
             password: _passController.text.trim())
             .then((v) async {
           if (v.statusCode == 200) {
-            //Fluttertoast.showToast(msg: v.message.toString());
             await UserPreferences().saveUser(v);
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => HomeScreen()));

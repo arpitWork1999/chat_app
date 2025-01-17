@@ -1,6 +1,7 @@
 import 'package:chat_application/providers/auth_provider.dart';
 import 'package:chat_application/providers/shared_prefrences_provider.dart';
 import 'package:chat_application/screens/login_screen.dart';
+import 'package:chat_application/screens/otp_screen.dart';
 import 'package:chat_application/utilities/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +18,6 @@ void main() async {
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );0--
-  // Initialize Shared Preferences
 
   final sharedPreferencesService = SharedPrefrencesService();
   await sharedPreferencesService.loadPrefrences();
@@ -41,6 +38,7 @@ class MyApp extends StatelessWidget {
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
+        // home: OtpScreen(),
         home: AuthenticationWrapper(),
       ),
     );
@@ -55,13 +53,8 @@ class AuthenticationWrapper extends StatelessWidget {
     return Consumer<SharedPrefrencesService>(
         builder: (context, sharedPreference, _) {
           // sharedPreference.loadPrefrences();
+          // return OtpScreen();
       return sharedPreference.isLoggedIn ? HomeScreen() : LoginScreen();
-      //     if(sharedPreference.isLoggedIn){
-      //   return HomeScreen();
-      // }
-      // else{
-      //   return LoginScreen();
-      // }
     });
   }
 }

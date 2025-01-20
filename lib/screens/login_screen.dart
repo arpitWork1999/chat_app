@@ -19,35 +19,31 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
 
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
   ApiService apiService = ApiService();
 
-
   Future<void> logIn() async {
     if (formKey.currentState!.validate()) {
-      try{
-        final response = await apiService.logInApi(
-            personalInfo: _emailController.text.trim(),
-            password: _passController.text.trim())
+      try {
+        final response = await apiService
+            .logInApi(
+                personalInfo: _emailController.text.trim(),
+                password: _passController.text.trim())
             .then((v) async {
           if (v.statusCode == 200) {
             await UserPreferences().saveUser(v);
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => HomeScreen()));
           }
-          else{
-            Fluttertoast.showToast(msg: "Invalid credentials!");
-          }
         });
-      }catch(e){
-        //print("ERROR====>$e");
+      } catch (e) {
         Fluttertoast.showToast(msg: "An error occurred: $e");
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -56,22 +52,22 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: FocusManager.instance.primaryFocus?.unfocus,
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text("Log In",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
+        ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(15),
             child: SingleChildScrollView(
               child: Form(
                 key: formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Log In",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
-                    ),
                     const SizedBox(
-                      height: 30,
+                      height: 10,
                     ),
                     TextFormField(
                       controller: _emailController,
@@ -103,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
-                              onPressed: (){
+                              onPressed: () {
                                 authProvider.passwordVisibility();
                               },
                               icon: Icon(authProvider.isObscured
@@ -141,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ForgotPasswordScreen()));
+                                    builder: (context) =>
+                                        ForgotPasswordScreen()));
                           },
                           child: const Text(
                             "Forgot Password",
@@ -160,7 +157,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 50,
                       width: MediaQuery.of(context).size.width / 1.7,
                       child: ElevatedButton(
-                          onPressed: logIn,
+                        onPressed: authProvider.isLoading
+                            ? null
+                            : () async {
+                          authProvider.setLoading(true);
+                          try {
+                            await logIn();
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          } finally {
+                            authProvider.setLoading(false);
+                          }
+                        },
                           // onPressed: () async {
                           //   try {
                           //     await authProvider.signin(
@@ -178,15 +185,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                               foregroundColor: Colors.white),
-                          child: const Text(
-                            "Log In",
-                            style: TextStyle(fontSize: 16),
-                          )),
-                    ),
+                        child: authProvider.isLoading
+                            ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                            : const Text('Log In'),
+                      )),
+                    //       child: const Text(
+                    //         "Log In",
+                    //         style: TextStyle(fontSize: 16),
+                    //       )),
+                    // ),
                     const SizedBox(
                       height: 20,
                     ),
-
                   ],
                 ),
               ),

@@ -26,41 +26,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
-  
+
   ApiService apiService = ApiService();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
   Future<void> signUp() async {
     if (formKey.currentState!.validate()) {
       if (_passController.text == _confirmPassController.text) {
-        print("Saved");
-        final provider = Provider.of<AuthProvider>(context, listen: false);
-        await apiService
-            .signUpApi(
-                userName: _firstNameController.text.trim(),
-                fullName:
-                    "${_firstNameController.text} ${_lastNameController.text.trim()}",
-                countryCode: provider.countryCode,
-                phoneNumber: _phoneNumberController.text.trim(),
-                email: _emailController.text.trim(),
-                password: _passController.text.trim())
-            .then((v) {
-          if (v.statusCode == 200) {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => OtpScreen(email: _emailController.text.trim(),)));
+        try {
+          final provider = Provider.of<AuthProvider>(context, listen: false);
+
+          final response = await apiService.signUpApi(
+            userName: _firstNameController.text.trim(),
+            fullName:
+                "${_firstNameController.text.trim()} ${_lastNameController.text.trim()}",
+            countryCode: provider.countryCode,
+            phoneNumber: _phoneNumberController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passController.text.trim(),
+          );
+          if (response.statusCode == 200) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OtpScreen(
+                  email: _emailController.text.trim(),
+                ),
+              ),
+            );
+          } else {
+            Fluttertoast.showToast(msg: "Sign Up Failed: ${response.message}");
           }
-        })
-            .catchError((error) {
-              print("error$error");
-        })
-        ;
+        } catch (error) {
+          print("Signup catch error===> ${error}");
+
+          Fluttertoast.showToast(
+              msg: "An error occurred during sign-up. Please try again.");
+        }
       } else {
-         print("object");
+        Fluttertoast.showToast(msg: "Passwords do not match!");
       }
-    } else {
-      Fluttertoast.showToast(msg: "Sign Up Failed!");
     }
   }
+
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   // Future<void> _signUp() async{
@@ -89,9 +97,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return GestureDetector(
       onTap: FocusManager.instance.primaryFocus?.unfocus,
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text("Create Account",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
+        ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(15),
             child: SingleChildScrollView(
               child: Form(
                 key: formKey,
@@ -99,13 +112,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    const Text(
-                      "Create Account",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
-                    ),
                     const SizedBox(
-                      height: 30,
+                      height: 10,
                     ),
                     TextFormField(
                       controller: _firstNameController,
@@ -143,13 +151,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     TextFormField(
                       controller: _phoneNumberController,
-                      keyboardType: TextInputType.name,
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                           prefixIcon: Consumer<AuthProvider>(
                             builder: (context, user, _) => CountryCodePicker(
                               onChanged: (countryCode) {
                                 user.name = countryCode.dialCode!;
-                                print("code====>${user.countryCode}");
                               },
                               initialSelection: user.countryCode,
                               favorite: ['+91', 'IN'],
@@ -161,8 +168,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           labelText: "Enter your phone number",
                           border: OutlineInputBorder()),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please Enter LastName";
+                        if (value!.isEmpty ||
+                            !RegExp(r'(^(?:[+0]9)?[0-9]{10,12}$)')
+                                .hasMatch(value)) {
+                          if (value == '') {
+                            return "Please Enter Phone number";
+                          } else {
+                            return "Please provide a valid Phone number";
+                          }
                         }
                         return null;
                       },
@@ -178,8 +191,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           labelText: "Email",
                           border: OutlineInputBorder()),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please Enter Email";
+                        if (value!.isEmpty ||
+                            !RegExp(r"^(?!.*\s)[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+(?!.*\s)")
+                                .hasMatch(value)) {
+                          if (value == '') {
+                            return "Your username is required";
+                          } else {
+                            return "Please provide a valid email address";
+                          }
                         }
                         return null;
                       },
@@ -237,15 +256,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 50,
                       width: MediaQuery.of(context).size.width / 1.7,
                       child: ElevatedButton(
-                          //onPressed: _signUp,
-                          onPressed: signUp,
+                          onPressed: authProvider.isLoading
+                              ? null
+                              : () async {
+                                  authProvider.setLoading(true);
+                                  try {
+                                    await signUp();
+                                    FocusScope.of(context)
+                                        .requestFocus(FocusNode());
+                                  } finally {
+                                    authProvider.setLoading(false);
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                               foregroundColor: Colors.white),
-                          child: const Text(
-                            "Create Account",
-                            style: TextStyle(fontSize: 16),
-                          )),
+                          child: authProvider.isLoading
+                              ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                              : const Text("Create Account"),
+                          ),
                     ),
                     const SizedBox(
                       height: 20,

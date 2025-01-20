@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 import '../service/api_service/api_service.dart';
 
-class OtpScreen extends StatelessWidget {
+class OtpScreen extends StatefulWidget {
   final String email; // Field to hold the passed data
 
   OtpScreen({Key? key, required this.email}) : super(key: key);
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
   ApiService apiService = ApiService();
+
   final TextEditingController pin1Controller = TextEditingController();
+
   final TextEditingController pin2Controller = TextEditingController();
+
   final TextEditingController pin3Controller = TextEditingController();
+
   final TextEditingController pin4Controller = TextEditingController();
 
+  FocusNode f1 = FocusNode();
+  FocusNode f2 = FocusNode();
+  FocusNode f3 = FocusNode();
+  FocusNode f4 = FocusNode();
+  @override
+  void initState() {
+    super.initState();
 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,129 +71,196 @@ class OtpScreen extends StatelessWidget {
                     SizedBox(
                       height: 68,
                       width: 64,
-                      child: TextFormField(
-                        controller: pin1Controller,
-                        onChanged: (value) {
-                          if (value.length == 1) {
-                            FocusScope.of(context).nextFocus();
+                      child: Focus(
+                        onKeyEvent: (FocusNode node, KeyEvent event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.backspace &&
+                              pin1Controller.text.isEmpty) {
                           }
+                          return KeyEventResult.ignored;
                         },
-                        onSaved: (pin1) {},
-                        decoration: InputDecoration(
-                          hintText: "0",
-                          enabledBorder: OutlineInputBorder(
+                        child: TextFormField(
+                          focusNode: f1,
+                          controller: pin1Controller,
+                          onChanged: (value) {
+                            if (value.length == 1) {
+                              f1.unfocus();
+                              FocusScope.of(context).requestFocus(f2);
+                            }
+                            if (value.isEmpty) {
+                              FocusScope.of(context).unfocus();
+                            }
+                          },
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          onSaved: (pin1) {},
+                          decoration: InputDecoration(
+                            hintText: "0",
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50),
+                                borderSide: const BorderSide(color: Colors.grey)),
+                            focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50),
-                              borderSide: const BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            borderSide: const BorderSide(
-                              color: Colors.orangeAccent,
+                              borderSide: const BorderSide(
+                                color: Colors.orangeAccent,
+                              ),
                             ),
                           ),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                         ),
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
                       ),
                     ),
                     SizedBox(
                       height: 68,
                       width: 64,
-                      child: TextFormField(
-                        controller: pin2Controller,
-                        onChanged: (value) {
-                          if (value.length == 1) {
-                            FocusScope.of(context).nextFocus();
+                      child: Focus(
+                        onKeyEvent: (FocusNode node, KeyEvent event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.backspace &&
+                              pin2Controller.text.isEmpty) {
+                            f2.unfocus();
+                            FocusScope.of(context).requestFocus(f1);
                           }
+                          return KeyEventResult.ignored; // Allow other listeners to handle
                         },
-                        onSaved: (pin2) {},
-                        decoration: InputDecoration(
-                          hintText: "0",
-                          enabledBorder: OutlineInputBorder(
+                        child: TextFormField(
+                          focusNode: f2,
+                          controller: pin2Controller,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              f2.unfocus();
+                              FocusScope.of(context).requestFocus(f1);
+                            } else if (value.length == 1) {
+                              f2.unfocus();
+                              FocusScope.of(context).requestFocus(f3);
+                            }
+                          },
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          onSaved: (pin2) {},
+                          decoration: InputDecoration(
+                            hintText: "0",
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50),
+                                borderSide: const BorderSide(color: Colors.grey)),
+                            focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50),
-                              borderSide: const BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            borderSide: const BorderSide(
-                              color: Colors.orangeAccent,
+                              borderSide: const BorderSide(
+                                color: Colors.orangeAccent,
+                              ),
                             ),
                           ),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                         ),
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
                       ),
                     ),
                     SizedBox(
                       height: 68,
                       width: 64,
-                      child: TextFormField(
-                        controller: pin3Controller,
-                        onChanged: (value) {
-                          if (value.length == 1) {
-                            FocusScope.of(context).nextFocus();
+                      child: Focus(
+                        onKeyEvent: (FocusNode node, KeyEvent event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.backspace &&
+                              pin2Controller.text.isEmpty) {
+                            f3.unfocus();
+                            FocusScope.of(context).requestFocus(f2);
                           }
+                          return KeyEventResult.ignored; // Allow other listeners to handle
                         },
-                        onSaved: (pin3) {},
-                        decoration: InputDecoration(
-                          hintText: "0",
-                          enabledBorder: OutlineInputBorder(
+                        child: TextFormField(
+                          focusNode: f3,
+                          controller: pin3Controller,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              f3.unfocus();
+                              FocusScope.of(context).requestFocus(f2);
+                            } else if (value.length == 1) {
+                              f3.unfocus();
+                              FocusScope.of(context).requestFocus(f4);
+                            }
+                          },
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          onSaved: (pin3) {},
+                          decoration: InputDecoration(
+                            hintText: "0",
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50),
+                                borderSide: const BorderSide(color: Colors.grey)),
+                            focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50),
-                              borderSide: const BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            borderSide: const BorderSide(
-                              color: Colors.orangeAccent,
+                              borderSide: const BorderSide(
+                                color: Colors.orangeAccent,
+                              ),
                             ),
                           ),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                         ),
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
                       ),
                     ),
                     SizedBox(
                       height: 68,
                       width: 64,
-                      child: TextFormField(
-                        controller: pin4Controller,
-                        onChanged: (value) {
-                          if (value.length == 1) {
-                            FocusScope.of(context).nextFocus();
+                      child: Focus(
+                        onKeyEvent: (FocusNode node, KeyEvent event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.backspace &&
+                              pin2Controller.text.isEmpty) {
+                            f4.unfocus();
+                            FocusScope.of(context).requestFocus(f3);
                           }
+                          return KeyEventResult.ignored; // Allow other listeners to handle
                         },
-                        onSaved: (pin4) {},
-                        decoration: InputDecoration(
-                          hintText: "0",
-                          enabledBorder: OutlineInputBorder(
+                        child: TextFormField(
+                          focusNode: f4,
+                          controller: pin4Controller,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              f4.unfocus();
+                              FocusScope.of(context).requestFocus(f3);
+                            }
+                          },
+                          autocorrect: false,
+                          textInputAction: TextInputAction.next,
+                          onSaved: (pin4) {},
+                          decoration: InputDecoration(
+                            hintText: "0",
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50),
+                                borderSide: const BorderSide(color: Colors.grey)),
+                            focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(50),
-                              borderSide: const BorderSide(color: Colors.grey)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            borderSide: const BorderSide(
-                              color: Colors.orangeAccent,
-                            ),),
-                          //filled: true,
+                              borderSide: const BorderSide(
+                                color: Colors.orangeAccent,
+                              ),
+                            ),
+                          ),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                         ),
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
                       ),
                     ),
                   ],
@@ -182,19 +268,19 @@ class OtpScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Did not receive OTP?",
                       style: TextStyle(fontSize: 15),
                     ),
                     TextButton(
                         onPressed: () {},
-                        child: Text(
+                        child: const Text(
                           "Resend",
                           style: TextStyle(fontSize: 15),
                         ))
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 SizedBox(
@@ -206,7 +292,10 @@ class OtpScreen extends StatelessWidget {
                             "${pin2Controller.text.toString()}"
                             "${pin3Controller.text.toString()}"
                             "${pin4Controller.text.toString()}";
-                        apiService.verifyOtp(email: email, otp: otpValue);
+                        apiService.verifyOtp(
+                            email: widget.email,
+                            otp: otpValue,
+                            context: context);
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,

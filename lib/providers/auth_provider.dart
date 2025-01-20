@@ -5,8 +5,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AuthProvider extends ChangeNotifier {
   String _countryCode = '+91';
   bool _isObscured = false;
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
 
   bool get isObscured => _isObscured;
+
+  void setLoading( bool value){
+    _isLoading = value;
+    notifyListeners();
+  }
 
   void passwordVisibility(){
     _isObscured = !_isObscured;

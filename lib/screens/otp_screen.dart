@@ -28,11 +28,6 @@ class _OtpScreenState extends State<OtpScreen> {
   FocusNode f2 = FocusNode();
   FocusNode f3 = FocusNode();
   FocusNode f4 = FocusNode();
-  @override
-  void initState() {
-    super.initState();
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +78,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           focusNode: f1,
                           controller: pin1Controller,
                           onChanged: (value) {
+                            print("Value===>>$value");
                             if (value.length == 1) {
                               f1.unfocus();
                               FocusScope.of(context).requestFocus(f2);
@@ -96,6 +92,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           onSaved: (pin1) {},
                           decoration: InputDecoration(
                             hintText: "0",
+                            hintStyle: TextStyle(color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50),
                                 borderSide: const BorderSide(color: Colors.grey)),
@@ -133,6 +130,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           focusNode: f2,
                           controller: pin2Controller,
                           onChanged: (value) {
+
                             if (value.isEmpty) {
                               f2.unfocus();
                               FocusScope.of(context).requestFocus(f1);
@@ -146,6 +144,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           onSaved: (pin2) {},
                           decoration: InputDecoration(
                             hintText: "0",
+                            hintStyle: TextStyle(color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50),
                                 borderSide: const BorderSide(color: Colors.grey)),
@@ -196,6 +195,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           onSaved: (pin3) {},
                           decoration: InputDecoration(
                             hintText: "0",
+                            hintStyle: TextStyle(color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50),
                                 borderSide: const BorderSide(color: Colors.grey)),
@@ -222,8 +222,8 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: Focus(
                         onKeyEvent: (FocusNode node, KeyEvent event) {
                           if (event is KeyDownEvent &&
-                              event.logicalKey == LogicalKeyboardKey.backspace &&
-                              pin2Controller.text.isEmpty) {
+                              event.logicalKey == LogicalKeyboardKey.backspace /*&&
+                              pin2Controller.text.isEmpty*/) {
                             f4.unfocus();
                             FocusScope.of(context).requestFocus(f3);
                           }
@@ -237,12 +237,16 @@ class _OtpScreenState extends State<OtpScreen> {
                               f4.unfocus();
                               FocusScope.of(context).requestFocus(f3);
                             }
+                            if(value.length==1){
+                              f4.unfocus();
+                            }
                           },
                           autocorrect: false,
                           textInputAction: TextInputAction.next,
                           onSaved: (pin4) {},
                           decoration: InputDecoration(
                             hintText: "0",
+                            hintStyle: const TextStyle(color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(50),
                                 borderSide: const BorderSide(color: Colors.grey)),

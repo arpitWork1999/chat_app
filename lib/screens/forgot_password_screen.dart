@@ -20,7 +20,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Forgot Password")),
+        centerTitle: true,
+        title: Text("Forgot Password", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700)),
+
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

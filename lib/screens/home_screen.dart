@@ -56,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ElevatedButton(
                       onPressed: (){
                         prefService.logout(context);
-
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,

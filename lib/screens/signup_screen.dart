@@ -46,7 +46,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             password: _passController.text.trim(),
           );
           if (response.statusCode == 200) {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => OtpScreen(
@@ -152,6 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextFormField(
                       controller: _phoneNumberController,
                       keyboardType: TextInputType.number,
+                      maxLength: 10,
                       decoration: InputDecoration(
                           prefixIcon: Consumer<AuthProvider>(
                             builder: (context, user, _) => CountryCodePicker(
